@@ -1,0 +1,46 @@
+name: "Terraform Apply"
+
+on:
+  push:
+    branches:
+      - infra
+
+permissions:
+  contents: read
+
+jobs:
+  terraform:
+    name: "Terraform Apply"
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./infra
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Validate and Auth with Google Cloud
+      # Recommended: Use Workload Identity Federation
+      # - id: 'auth'
+      #   name: 'Authenticate to Google Cloud'
+      #   uses: 'google-github-actions/auth@v2'
+      #   with:
+      #     workload_identity_provider: 'projects/123456789/locations/global/workloadIdentityPools/my-pool/providers/my-provider'
+      #     service_account: 'my-service-account@my-project.iam.gserviceaccount.com'
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.5.0
+
+      - name: Terraform Init
+        id: init
+        run: terraform init
+
+      - name: Terraform Apply
+        id: apply
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        run: terraform apply -auto-approve -input=false
+        env:
+          TF_VAR_project_id: ${{ secrets.GCP_PROJECT_ID }}

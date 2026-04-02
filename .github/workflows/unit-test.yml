@@ -1,0 +1,154 @@
+name: Phi Studio UI Unit Tests
+
+on:
+  pull_request:
+    paths:
+      - 'src/**'
+      - '.github/workflows/unit.test.yaml'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      # ------------------------------------------------------------
+      # Checkout
+      # ------------------------------------------------------------
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # ------------------------------------------------------------
+      # Node + pnpm
+      # ------------------------------------------------------------
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: pnpm
+
+      - name: Install pnpm
+        run: |
+          npm install -g pnpm
+          pnpm --version
+
+      # ------------------------------------------------------------
+      # Workspace install
+      # ------------------------------------------------------------
+      - name: Install workspace dependencies
+        run: pnpm install -w --include=dev
+
+      # Build shared packages (if any)
+
+      - name: Build workspace packages
+        run: pnpm -w run build --if-present
+
+      # ------------------------------------------------------------
+      # Install UI dependencies
+      # ------------------------------------------------------------
+      - name: Install UI dev dependencies
+        run: pnpm -C src install --include=dev
+
+      - name: Verify Vitest installation
+        run: |
+          pnpm -C src exec -- vitest -v || true
+          ls -la src/node_modules/.bin || true
+          pnpm -C src ls vitest --depth 0 || true
+
+      # ------------------------------------------------------------
+      # Run Unit Tests
+      # ------------------------------------------------------------
+      - name: Run UI Unit Tests
+        id: run-unit-tests
+        continue-on-error: true
+        working-directory: src
+        run: pnpm test:unit
+
+      # Coverage Threshold Check
+      - name: Coverage Threshold Check
+        id: coverage-check
+        if: always()
+        continue-on-error: true
+        env:
+          THRESHOLD: ${{ vars.UNIT_TEST_COVERAGE_THRESHOLD || '80' }}
+        run: |
+          node ./scripts/check-coverage.js \
+            --file=src/reports/unit/coverage/coverage-summary.json \
+            --threshold=$THRESHOLD
+
+      # Reporting
+      - name: Generate Markdown Report
+        if: always()
+        run: |
+          node ./scripts/reporting/generate-md-custom.js \
+            --junit=src/junit.xml \
+            --out=src/test-report.md \
+            --title="Phi Studio UI Unit Test Report"
+
+      - name: Upload full report artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ui-unit-test-report
+          path: src/test-report.md
+
+      - name: Generate Summary Markdown Report
+        if: always()
+        run: |
+          node ./scripts/reporting/generate-md-custom.js \
+            --junit=src/junit.xml \
+            --out=src/test-report-summary.md \
+            --mode=summary \
+            --full="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" \
+            --title="Phi Studio UI Unit Test Report" \
+            --artifact=ui-unit-test-report
+
+      # ------------------------------------------------------------
+      # PR Comments
+      # ------------------------------------------------------------
+      - name: Post Test Summary as PR comment
+        if: ${{ github.event_name == 'pull_request' && steps.run-unit-tests.outcome == 'failure' }}
+        uses: peter-evans/create-or-update-comment@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          issue-number: ${{ github.event.pull_request.number }}
+          body-file: src/test-report-summary.md
+          edit-mode: replace
+
+      - name: Append Markdown Report to Job Summary
+        if: always()
+        run: |
+          REPORT="src/test-report.md"
+          if [ -f "$REPORT" ]; then
+            cat "$REPORT" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "::warning::Markdown report not found at $REPORT"
+          fi
+
+      # ------------------------------------------------------------
+      # Coverage PR Comment
+      # ------------------------------------------------------------
+      - name: Post Coverage Comment (PR Conversation)
+        if: ${{ github.event_name == 'pull_request' && steps.coverage-check.outcome == 'failure' }}
+        uses: davelosert/vitest-coverage-report-action@v2
+        with:
+          json-summary-path: src/reports/unit/coverage/coverage-summary.json
+          json-final-path: src/reports/unit/coverage/coverage-final.json
+          vite-config-path: src/vitest.config.ts
+          comment-on: pr
+          name: ui-coverage
+          threshold-icons: "{0: '🔴', 80: '🟢'}"
+
+      # ------------------------------------------------------------
+      # Hard gates
+      # ------------------------------------------------------------
+      - name: Fail job if coverage is below threshold
+        if: steps.coverage-check.outcome == 'failure'
+        run: |
+          echo "Coverage is below threshold. Failing job."
+          exit 1
+
+      - name: Fail job if unit tests failed
+        if: steps.run-unit-tests.outcome == 'failure'
+        run: |
+          echo "Unit tests failed. Failing job."
+          exit 1
