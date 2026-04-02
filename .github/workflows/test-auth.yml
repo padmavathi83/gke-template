@@ -29,5 +29,5 @@ jobs:
       - name: Show active account
         run: gcloud auth list
 
-      - name: Test access to project
+      - name: Test access 
         run: gcloud projects describe ${{ vars.GCP_PROJECT_ID }}
