@@ -1,41 +1,33 @@
-name: GCP OIDC Auth Test
+name: Test GCP Auth
 
 on:
+  workflow_dispatch:   # Allows manual trigger
   push:
     branches:
-      - main   # change if your branch is 
-
-permissions:
-  id-token: write   # REQUIRED for OIDC
-  contents: read
+      - main
 
 jobs:
-  auth-test:
-   runs-on: ubuntu-latest
+  validate-gcp-auth:
+    runs-on: ubuntu-latest
 
+    permissions:
+      contents: read
+      id-token: write
 
-   steps:
-   - name: Checkout repository
-     uses: actions/checkout@v4
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
 
-   - name: Authenticate to Google Cloud
-     id: auth
-     uses: google-github-actions/auth@v2
-     with:
-      workload_identity_provider: projects/428641430361/locations/global/workloadIdentityPools/github-pool/providers/github-provider
-      service_account: github-sa@project-eb9a3368-5e31-47ac-837.iam.gserviceaccount.com
+      - name: Authenticate to GCP via Workload Identity
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
 
-   - name: Print OIDC token claims
-     run: |
-      echo "${ACTIONS_ID_TOKEN}" | jq -R 'split(".") | .[1] | @base64d | fromjson'
+      - name: Setup gcloud
+        uses: google-github-actions/setup-gcloud@v2
 
+      - name: Show active account
+        run: gcloud auth list
 
-   - name: Set up gcloud CLI
-     uses: google-github-actions/setup-gcloud@v2
-
-   - name: Verify authentication
-     run: gcloud auth list
-
-   - name: Test GCP access
-     run: gcloud projects list
-
+      - name: Test access to project
+        run: gcloud projects describe ${{ secrets.GCP_PROJECT_ID }}
