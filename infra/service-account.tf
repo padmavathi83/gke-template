@@ -15,7 +15,7 @@ resource "google_iam_workload_identity_pool_provider" "github" {
   attribute_condition = <<EOT
     assertion.repository_owner_id == "225588908" &&
     attribute.repository == "gradera/bn-ui-global-shell"
-
+EOT
   attribute_mapping = {
     "google.subject"       = "assertion.sub"
     "attribute.actor"      = "assertion.actor"
