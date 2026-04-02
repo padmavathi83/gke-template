@@ -18,6 +18,7 @@ variable "zones" {
 variable "tf_state_bucket_name" {
   description = "The name of the GCS bucket to store Terraform state (must be globally unique)"
   type        = string
+  default     = "mybucket"
 }
 
 variable "enable_k8s_beta_apis" {
@@ -29,6 +30,7 @@ variable "enable_k8s_beta_apis" {
 variable "service_account_name" {
   description = "The name of the service account to be used by GKE nodes"
   type        = string
+  default     = "gke-sa"
 }
 
 variable "subdomain_prefix" {
@@ -52,6 +54,7 @@ variable "gke_default_max_pods_per_node" {
 variable "k8s_namespace" {
   description = "The Kubernetes namespace to use"
   type        = string
+  default     = deveke
 }
 
 variable "subnet_ip" {
