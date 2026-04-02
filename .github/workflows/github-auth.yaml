@@ -21,7 +21,7 @@ jobs:
       - name: Authenticate to GCP via Workload Identity
         uses: google-github-actions/auth@v2
         with:
-          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          workload_identity_provider: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER }}
 
       - name: Setup gcloud
         uses: google-github-actions/setup-gcloud@v2
@@ -30,4 +30,4 @@ jobs:
         run: gcloud auth list
 
       - name: Test access to project
-        run: gcloud projects describe ${{ secrets.GCP_PROJECT_ID }}
+        run: gcloud projects describe ${{ vars.GCP_PROJECT_ID }}
