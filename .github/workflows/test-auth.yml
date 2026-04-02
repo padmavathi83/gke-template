@@ -1,0 +1,33 @@
+name: Test GCP Auth
+
+on:
+  workflow_dispatch:   # Allows manual trigger
+  push:
+    branches:
+      - infra
+
+jobs:
+  validate-gcp-auth:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Authenticate to GCP via Workload Identity
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+
+      - name: Setup gcloud
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Show active account
+        run: gcloud auth list
+
+      - name: Test access to project
+        run: gcloud projects describe ${{ secrets.GCP_PROJECT_ID }}
