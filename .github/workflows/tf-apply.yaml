@@ -2,9 +2,10 @@
 name: "Terraform Apply"
 
 on:
+  workflow_dispatch:
   push:
     branches:
-      - infra
+      - feat/gke
 
 permissions:
   contents: read
