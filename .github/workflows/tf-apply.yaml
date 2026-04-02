@@ -43,4 +43,4 @@ jobs:
         id: apply
         run: terraform apply -auto-approve -input=false
         env:
-          TF_VAR_project_id: ${{ secrets.GCP_PROJECT_ID }}
+          TF_VAR_project_id: ${{ vars.GCP_PROJECT_ID }}
