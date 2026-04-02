@@ -54,7 +54,7 @@ variable "gke_default_max_pods_per_node" {
 variable "k8s_namespace" {
   description = "The Kubernetes namespace to use"
   type        = string
-  default     = deveke
+  default     = "deveke"
 }
 
 variable "subnet_ip" {
