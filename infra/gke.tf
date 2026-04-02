@@ -46,7 +46,7 @@ module "gke" {
       machine_type    = var.gke_node_pool_machine_type
       auto_repair     = true
       auto_upgrade    = true
-      service_account    = var.service_account_name.email
+      # service_account    = var.service_account_name.email
       preemptible        = false
       enable_secure_boot = true
       max_pods_per_node = 12
