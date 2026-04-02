@@ -54,7 +54,6 @@ jobs:
         run: terraform plan -no-color -input=false
         continue-on-error: true
         env:
-          GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
           TF_VAR_project_id: ${{ secrets.GCP_PROJECT_ID }}
 
       - name: Update Pull Request
