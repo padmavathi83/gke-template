@@ -20,12 +20,6 @@ variable "tf_state_bucket_name" {
   type        = string
 }
 
-variable "environment" {
-  description = "The environment name (e.g. dev, prod)"
-  type        = string
-  default     = "dev"
-}
-
 variable "enable_k8s_beta_apis" {
   description = "Description: (Optional) - List of Kubernetes Beta APIs to enable in cluster."
   type        = list(string)
