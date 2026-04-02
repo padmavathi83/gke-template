@@ -38,3 +38,4 @@ resource "google_project_iam_member" "github_gke" {
   role    = "roles/container.admin"
   member  = "principalSet://iam.googleapis.com/${google_iam_workload_identity_pool.github.name}/*"
 }
+
