@@ -30,6 +30,7 @@ jobs:
         uses: 'google-github-actions/auth@v2'
         with:
            workload_identity_provider: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+           service_account: github-sa@project-eb9a3368-5e31-47ac-837.iam.gserviceaccount.com
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
