@@ -13,5 +13,6 @@ module "project-services" {
     "iam.googleapis.com",
     "secretmanager.googleapis.com",
     "servicenetworking.googleapis.com",
+    "storage.googleapis.com"
   ]
 }
