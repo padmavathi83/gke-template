@@ -13,7 +13,7 @@ module "gke" {
   version = "~> 43.0"
 
   project_id                  = var.project_id
-  name                        = "${var.environment}-gke-cluster"
+  name                        = "${var.environment}-gke-cluster1"
   regional                    = true
   region                      = var.region
   zones                       = var.zones
@@ -71,33 +71,4 @@ resource "google_project_iam_member" "gke_sa_artifact_registry_reader" {
   project = var.project_id
   role    = "roles/artifactregistry.reader"
   member  = "serviceAccount:${module.gke.service_account}"
-}
-
-resource "google_project_iam_member" "gke_sa_secret_manager_accessor" {
-  project = var.project_id
-  role    = "roles/secretmanager.secretAccessor"
-  member  = "principal://iam.googleapis.com/projects/${data.google_project.project.number}/locations/global/workloadIdentityPools/${var.project_id}.svc.id.goog/subject/ns/${var.k8s_namespace}/sa/default"
-}
-
-resource "google_project_iam_member" "gke_sa_cloud_sql_client" {
-  project = var.project_id
-  role    = "roles/cloudsql.client"
-  member  = "serviceAccount:${module.gke.service_account}"
-}
-
-resource "google_project_iam_member" "gke_sa_cloud_sql_instance_user" {
-  project = var.project_id
-  role    = "roles/cloudsql.instanceUser"
-  member  = "serviceAccount:${module.gke.service_account}"
-}
-
-# Grants the Kubernetes default service account (via Workload Identity) the
-# Vertex AI User role so that pods can call aiplatform.googleapis.com without
-# needing a service-account key file. This is the ADC path used by both
-# GeminiClient (LLM) and GeminiEmbeddingsClient (embeddings).
-# IAM principal format: Workload Identity pool subject for ns/<namespace>/sa/default
-resource "google_project_iam_member" "gke_workload_identity_aiplatform_user" {
-  project = var.project_id
-  role    = "roles/aiplatform.user"
-  member  = "principal://iam.googleapis.com/projects/${data.google_project.project.number}/locations/global/workloadIdentityPools/${var.project_id}.svc.id.goog/subject/ns/${var.k8s_namespace}/sa/default"
 }
