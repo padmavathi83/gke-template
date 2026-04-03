@@ -19,7 +19,7 @@ module "gcp_network" {
   ]
 
   secondary_ranges = {
-    "${var.environment}-subnet" = [
+    "${var.environment}-subnet12" = [
       {
         range_name    = "ip-range-pods"
         ip_cidr_range = var.secondary_ranges_pods_ip
