@@ -1,14 +1,14 @@
 
 resource "google_iam_workload_identity_pool" "github" {
   project                   = var.project_id
-  workload_identity_pool_id = "github-pool"
+  workload_identity_pool_id = "github-pool-sa"
   display_name              = "GitHub Actions Pool"
   description               = "Identity pool for GH Actions to access GCP resources"
 }
 
 resource "google_iam_workload_identity_pool_provider" "github" {
   workload_identity_pool_id          = google_iam_workload_identity_pool.github.workload_identity_pool_id
-  workload_identity_pool_provider_id = "github-provider"
+  workload_identity_pool_provider_id = "github-actions-provider"
   display_name                       = "GitHub Actions Provider"
   description                        = "GitHub Actions identity pool provider"
   #   disabled                           = true
