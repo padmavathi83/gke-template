@@ -5,7 +5,7 @@ module "gar" {
   project_id    = var.project_id
   location      = var.region
   format        = "DOCKER"
-  repository_id = "bnsf-artifact-repo"
+  repository_id = "bnsf-artifact-repo1"
 
   labels = var.labels
 }
