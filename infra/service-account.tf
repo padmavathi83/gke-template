@@ -13,8 +13,8 @@ resource "google_iam_workload_identity_pool_provider" "github" {
   description                        = "GitHub Actions identity pool provider"
   #   disabled                           = true
   attribute_condition = <<EOT
-    assertion.repository_owner_id == "225588908" &&
-    attribute.repository == "gradera/bn-ui-global-shell"
+    assertion.repository_owner_id == "33541039" &&
+    attribute.repository == "padmavathi83/gke-template"
 EOT
   attribute_mapping = {
     "google.subject"       = "assertion.sub"
