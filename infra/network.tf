@@ -7,7 +7,7 @@ module "gcp_network" {
 
   subnets = [
     {
-      subnet_name               = "${var.environment}-subnet"
+      subnet_name               = "${var.environment}-subnet12"
       subnet_ip                 = var.subnet_ip
       subnet_region             = var.region
       subnet_private_access     = true
