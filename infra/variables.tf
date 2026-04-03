@@ -18,7 +18,7 @@ variable "zones" {
 variable "tf_state_bucket_name" {
   description = "The name of the GCS bucket to store Terraform state (must be globally unique)"
   type        = string
-  default     = "mybucket"
+  default     = "mybucket-87357489"
 }
 
 variable "enable_k8s_beta_apis" {
