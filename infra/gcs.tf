@@ -7,7 +7,7 @@
     public_access_prevention    = "enforced"
 
       logging {
-       log_bucket = "bnsf-logging-bucket325u7"
+       log_bucket = "bnsf-logging-bucket325y"
       }
 
    versioning {
