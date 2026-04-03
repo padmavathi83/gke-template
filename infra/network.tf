@@ -3,7 +3,7 @@ module "gcp_network" {
   version = "~> 13.0"
 
   project_id   = var.project_id
-  network_name = "${var.environment}-vpc"
+  network_name = "${var.environment}-vpcd"
 
   subnets = [
     {
